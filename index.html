@@ -1,0 +1,347 @@
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <title>Avaliação de Competências Colaborativa</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #f0f2f5;
+            position: relative; 
+        }
+        .container {
+            display: grid;
+            grid-template-columns: repeat(1, 1fr);
+            gap: 20px;
+        }
+        .user-section {
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            margin-bottom: 20px; 
+        }
+        select {
+            width: 100%;
+            padding: 10px;
+            margin-bottom: 20px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            box-sizing: border-box; 
+        }
+        .question {
+            margin-bottom: 25px;
+            border-bottom: 1px solid #eee;
+            padding-bottom: 15px;
+        }
+        .question p strong {
+            color: #333;
+        }
+        .score-btn {
+            margin: 5px 3px; 
+            padding: 8px 12px; 
+            border: 1px solid transparent; 
+            border-radius: 5px;
+            cursor: pointer;
+            transition: all 0.2s ease-in-out;
+            font-size: 14px;
+        }
+        .score-btn[data-score="5"] { background-color: #4CAF50; color: white; border-color: #388E3C; }
+        .score-btn[data-score="2.5"] { background-color: #FFC107; color: black; border-color: #FFA000; }
+        .score-btn[data-score="0"] { background-color: #f44336; color: white; border-color: #D32F2F; }
+
+        .score-btn:hover {
+            opacity: 0.9;
+            transform: translateY(-1px);
+        }
+        .score-btn.selected {
+            transform: scale(1.05);
+            box-shadow: 0 3px 6px rgba(0,0,0,0.2);
+            font-weight: bold;
+        }
+        #report, .history-section {
+            margin-top: 30px;
+            padding: 20px;
+            background: white;
+            border-radius: 10px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        #report h2, .history-section h2 {
+            margin-top: 0;
+            color: #1976D2; 
+            border-bottom: 2px solid #eee;
+            padding-bottom: 10px;
+        }
+        .answer {
+            font-style: italic;
+            background-color: #f9f9f9;
+            padding: 10px;
+            border-left: 4px solid #ccc;
+            margin: 10px 0;
+            font-size: 0.95em;
+            color: #555;
+        }
+        .evaluator-label {
+            font-weight: bold;
+            font-size: 20px; 
+            margin-bottom: 15px; 
+            color: #1976D2; 
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+        .finalize-btn {
+            margin: 20px 0 0 0; 
+            padding: 12px 25px; 
+            background-color: #2196F3;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 16px; 
+            transition: background-color 0.3s;
+        }
+        .finalize-btn:hover:not(:disabled) {
+            background-color: #1976D2;
+        }
+        .finalize-btn:disabled {
+            background-color: #ccc;
+            cursor: not-allowed;
+        }
+        .status-badge {
+            display: inline-block;
+            padding: 6px 12px; 
+            border-radius: 15px;
+            font-size: 14px; 
+            margin-left: 10px;
+            font-weight: normal; 
+            vertical-align: middle; 
+        }
+        .status-badge.waiting {
+            background-color: #FFC107;
+            color: black;
+        }
+        .status-badge.completed {
+            background-color: #4CAF50;
+            color: white;
+        }
+        .history-section {
+            margin-top: 20px;
+            background: #fff; 
+            padding: 15px;
+            border-radius: 8px;
+        }
+        .history-item {
+            margin-bottom: 15px; 
+            padding: 15px; 
+            border: 1px solid #eee; 
+            border-radius: 5px;
+            background-color: #f9f9f9;
+        }
+        .history-item h3 {
+             margin-top: 0;
+             margin-bottom: 10px;
+             color: #555;
+        }
+        .history-item p {
+             margin: 5px 0;
+        }
+         .history-item details summary {
+            cursor: pointer;
+            font-weight: bold;
+            color: #1976D2;
+         }
+         .history-item details ul {
+            margin-top: 10px;
+            padding-left: 20px;
+            list-style: disc;
+         }
+         .history-item details ul li {
+            margin-bottom: 5px;
+            font-size: 0.9em;
+         }
+
+        .instructions {
+            background-color: #e3f2fd;
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            border-left: 5px solid #2196F3;
+        }
+
+        .instructions h3 {
+            color: #0d47a1;
+            margin-top: 0;
+        }
+
+        .step {
+            margin-bottom: 10px;
+            padding-left: 25px; 
+            position: relative;
+            line-height: 1.6; 
+        }
+
+        .step:before {
+            content: "✔"; 
+            position: absolute;
+            left: 0;
+            top: 4px; 
+            width: 20px; 
+            height: 20px; 
+            background-color: #2196F3;
+            color: white;
+            border-radius: 50%;
+            text-align: center;
+            line-height: 20px; 
+            font-size: 12px;
+        }
+
+        .evaluator-selection {
+            text-align: center;
+            margin: 50px auto;
+            max-width: 500px;
+            background: white;
+            padding: 30px; 
+            border-radius: 10px;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1); 
+        }
+         .evaluator-selection h2 {
+            margin-bottom: 25px; 
+            color: #333;
+         }
+
+        .evaluator-btn {
+            display: block;
+            width: 100%;
+            padding: 15px;
+            margin: 15px 0; 
+            background-color: #2196F3;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            font-size: 18px;
+            cursor: pointer;
+            transition: all 0.3s;
+            box-sizing: border-box;
+        }
+
+        .evaluator-btn:hover {
+            background-color: #0d8aee;
+            transform: translateY(-2px); 
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+
+        #clear-storage-btn {
+             background-color: #f44336;
+             margin-top: 20px;
+        }
+         #clear-storage-btn:hover {
+            background-color: #d32f2f;
+         }
+
+        .hidden {
+            display: none;
+        }
+
+        #sync-indicator {
+            display: none;
+            position: fixed;
+            top: 15px; 
+            right: 15px; 
+            background-color: #ffeb3b;
+            padding: 8px 15px; 
+            border-radius: 20px; 
+            font-size: 12px;
+            font-weight: bold;
+            color: #333;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.2);
+            z-index: 1000;
+            animation: fadeInOut 1s ease-in-out;
+        }
+
+        @keyframes fadeInOut {
+            0% { opacity: 0; transform: translateY(-10px); }
+            20% { opacity: 1; transform: translateY(0); }
+            80% { opacity: 1; transform: translateY(0); }
+            100% { opacity: 0; transform: translateY(-10px); }
+        }
+    </style>
+</head>
+<body>
+    <!-- Evaluator Selection Screen -->
+    <div class="evaluator-selection" id="evaluator-selection">
+        <h2>Selecione o Avaliador</h2>
+        <button class="evaluator-btn" data-evaluator="1">Avaliador: Davi</button>
+        <button class="evaluator-btn" data-evaluator="2">Avaliador: Giovanni</button>
+        <button class="evaluator-btn" id="clear-storage-btn">Limpar Seleção Local</button>
+    </div>
+
+    <!-- Instructions -->
+    <div class="instructions hidden" id="instructions">
+        <h3>Como usar o sistema de avaliação (Versão Online Colaborativa)</h3>
+        <div class="step">Selecione seu nome (Davi ou Giovanni) na tela inicial. Sua seleção será lembrada neste navegador.</div>
+        <div class="step">Selecione um candidato da lista. O estado (candidato selecionado, notas) é compartilhado em tempo real.</div>
+        <div class="step">Responda todas as questões. Seu progresso é visto pelo outro avaliador instantaneamente.</div>
+        <div class="step">Clique em "Finalizar Avaliação" quando terminar. Seu status mudará para "Finalizado".</div>
+        <div class="step">O relatório final só será gerado quando AMBOS os avaliadores finalizarem a avaliação para o MESMO candidato.</div>
+        <div class="step">O histórico mostra todas as avaliações finalizadas individualmente.</div>
+        <div class="step">Use "Limpar Seleção Local" na tela inicial para esquecer qual avaliador foi selecionado neste navegador (não afeta os dados da avaliação).</div>
+    </div>
+
+    <!-- Main Evaluation Container -->
+    <div class="container hidden" id="evaluation-container">
+        <div class="user-section" id="user-section">
+            <!-- Evaluator Label and Status -->
+            <div class="evaluator-label" id="evaluator-label">
+                Avaliador: <span id="evaluator-name"></span>
+                <span id="status-user" class="status-badge waiting">Aguardando</span>
+            </div>
+            <!-- Candidate Selection Dropdown -->
+            <select class="user-select" id="user-select">
+                <option value="">Selecione o Candidato</option>
+                <!-- Options generated by JavaScript -->
+            </select>
+            <!-- Questions Area -->
+            <div id="questions-user">
+                <!-- Questions generated by JavaScript -->
+            </div>
+            <!-- Finalize Button -->
+            <button class="finalize-btn" id="finalize-user">Finalizar Avaliação</button>
+        </div>
+
+        <!-- Final Report Area -->
+        <div id="report" class="hidden">
+             <!-- Report generated by JavaScript -->
+             <h2>Relatório Final</h2>
+             <p>Aguardando a finalização de ambos os avaliadores para o mesmo candidato...</p>
+        </div>
+
+        <!-- History Section -->
+        <div class="history-section hidden" id="history-section">
+            <h2>Histórico de Avaliações Finalizadas</h2>
+            <div id="evaluation-history">
+                <!-- History generated by JavaScript -->
+                 <p>Nenhuma avaliação registrada ainda.</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Sync Indicator -->
+    <div id="sync-indicator">
+        Sincronizando...
+    </div>
+
+    <!-- Importmap for WebsimSocket -->
+    <script type="importmap">
+        {
+            "imports": {
+                "websim": "/websim.js"
+            }
+        }
+    </script>
+    <script type="module" src="/websim.js"></script>
+    <script type="module" src="js/app.js"></script>
+</body>
+</html>
